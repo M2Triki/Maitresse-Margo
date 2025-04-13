@@ -53,12 +53,22 @@ function maitresse_margo_scripts()
 {
     // Styles
     wp_enqueue_style('maitresse-margo-style', get_stylesheet_uri(), array(), MAITRESSE_MARGO_VERSION);
-    wp_enqueue_style('maitresse-margo-main', MAITRESSE_MARGO_URI . '/assets/css/main.css', array(), MAITRESSE_MARGO_VERSION);
-    wp_enqueue_style('maitresse-margo-responsive', MAITRESSE_MARGO_URI . '/assets/css/responsive.css', array(), MAITRESSE_MARGO_VERSION);
+
+    // Vérifier si les fichiers CSS existent avant de les inclure
+    if (file_exists(MAITRESSE_MARGO_DIR . '/assets/css/style.css')) {
+        wp_enqueue_style('maitresse-margo-main', MAITRESSE_MARGO_URI . '/assets/css/style.css', array(), MAITRESSE_MARGO_VERSION);
+    }
+
+    if (file_exists(MAITRESSE_MARGO_DIR . '/assets/css/responsive.css')) {
+        wp_enqueue_style('maitresse-margo-responsive', MAITRESSE_MARGO_URI . '/assets/css/responsive.css', array(), MAITRESSE_MARGO_VERSION);
+    }
+
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', array(), '5.15.3');
 
     // Scripts
-    wp_enqueue_script('maitresse-margo-main', MAITRESSE_MARGO_URI . '/assets/js/main.js', array('jquery'), MAITRESSE_MARGO_VERSION, true);
+    if (file_exists(MAITRESSE_MARGO_DIR . '/assets/js/main.js')) {
+        wp_enqueue_script('maitresse-margo-main', MAITRESSE_MARGO_URI . '/assets/js/main.js', array('jquery'), MAITRESSE_MARGO_VERSION, true);
+    }
 
     if (is_singular() && comments_open() && get_option('thread_comments')) {
         wp_enqueue_script('comment-reply');
@@ -69,74 +79,32 @@ add_action('wp_enqueue_scripts', 'maitresse_margo_scripts');
 /**
  * Inclure les fichiers des Custom Post Types
  */
-require MAITRESSE_MARGO_DIR . '/inc/cpt-hero.php';
-require MAITRESSE_MARGO_DIR . '/inc/cpt-presentation.php';
-require MAITRESSE_MARGO_DIR . '/inc/cpt-testimonials.php';
-require MAITRESSE_MARGO_DIR . '/inc/cpt-services.php';
-require MAITRESSE_MARGO_DIR . '/inc/cpt-contact.php';
-
-/**
- * Inclure les champs personnalisés (ACF)
- */
-require MAITRESSE_MARGO_DIR . '/inc/custom-fields.php';
-
-/**
- * Fonction pour récupérer le dernier élément d'un CPT
- */
-function maitresse_margo_get_latest_cpt($post_type)
-{
-    $args = array(
-        'post_type'      => $post_type,
-        'posts_per_page' => 1,
-        'orderby'        => 'date',
-        'order'          => 'DESC',
-    );
-
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
-        wp_reset_postdata();
-        return $post_id;
-    }
-
-    return false;
+// Inclure le fichier helpers.php s'il existe
+$helpers_file = MAITRESSE_MARGO_DIR . '/inc/helpers.php';
+if (file_exists($helpers_file)) {
+    require $helpers_file;
 }
 
-/**
- * Fonction pour récupérer tous les éléments d'un CPT
- */
-function maitresse_margo_get_all_cpt($post_type, $limit = -1)
-{
-    $args = array(
-        'post_type'      => $post_type,
-        'posts_per_page' => $limit,
-        'orderby'        => 'menu_order',
-        'order'          => 'ASC',
-    );
-
-    $query = new WP_Query($args);
-
-    if ($query->have_posts()) {
-        return $query->posts;
-    }
-
-    return array();
+// Créer le dossier inc/cpt s'il n'existe pas
+$cpt_dir = MAITRESSE_MARGO_DIR . '/inc/cpt';
+if (!file_exists($cpt_dir)) {
+    wp_mkdir_p($cpt_dir);
 }
 
-/**
- * Fonction pour afficher un template part
- */
-function maitresse_margo_get_template_part($slug, $name = null, $args = array())
-{
-    if (is_array($args) && !empty($args)) {
-        extract($args);
-    }
+// Liste des fichiers CPT à inclure
+$cpt_files = array(
+    'cpt-hero.php',
+    'cpt-presentation.php',
+    'cpt-services.php',
+    'cpt-newsletter.php',
+    'cpt-featured.php',
+    'cpt-about.php'
+);
 
-    if ($name) {
-        get_template_part('template-parts/' . $slug, $name);
-    } else {
-        get_template_part('template-parts/' . $slug);
+// Inclure chaque fichier CPT s'il existe
+foreach ($cpt_files as $cpt_file) {
+    $file_path = $cpt_dir . '/' . $cpt_file;
+    if (file_exists($file_path)) {
+        require $file_path;
     }
 }

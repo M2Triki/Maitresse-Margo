@@ -9,40 +9,53 @@
 // Récupérer tous les services
 $services = maitresse_margo_get_all_cpt('service');
 
+// Services par défaut si aucun n'est défini
+$default_services = array(
+    array(
+        'title' => 'Préparer le CRPE',
+        'icon' => 'graduate',
+        'link' => '#'
+    ),
+    array(
+        'title' => 'Préparer sa classe',
+        'icon' => 'school',
+        'link' => '#'
+    ),
+    array(
+        'title' => 'Boutique pédagogique',
+        'icon' => 'book',
+        'link' => '#'
+    )
+);
+
+// Utiliser les services définis ou les services par défaut
 if (empty($services)) {
-    return;
+    $services_to_display = $default_services;
+} else {
+    $services_to_display = array();
+    foreach ($services as $service) {
+        $services_to_display[] = array(
+            'title' => $service->post_title,
+            'icon' => get_post_meta($service->ID, '_service_icon', true),
+            'link' => get_post_meta($service->ID, '_service_link_url', true)
+        );
+    }
 }
 ?>
 
-<section class="services-section section">
+<section class="services-section">
     <div class="container">
-        <h2 class="section-title"><?php esc_html_e('Nos Services', 'maitresse-margo'); ?></h2>
-
         <div class="services-grid">
-            <?php foreach ($services as $service) :
-                $service_id = $service->ID;
-                $title = $service->post_title;
-                $content = $service->post_content;
-                $icon = get_post_meta($service_id, '_service_icon', true);
-                $link_text = get_post_meta($service_id, '_service_link_text', true);
-                $link_url = get_post_meta($service_id, '_service_link_url', true);
+            <?php foreach ($services_to_display as $service) :
+                $icon = !empty($service['icon']) ? $service['icon'] : 'graduate';
+                $link = !empty($service['link']) ? $service['link'] : '#';
             ?>
                 <div class="service-item">
-                    <?php if ($icon) : ?>
-                        <div class="service-icon">
-                            <i class="<?php echo esc_attr($icon); ?>"></i>
-                        </div>
-                    <?php endif; ?>
-
-                    <h3 class="service-title"><?php echo esc_html($title); ?></h3>
-
-                    <div class="service-content">
-                        <?php echo wp_kses_post($content); ?>
+                    <div class="service-icon icon-primary">
+                        <?php echo maitresse_margo_get_svg($icon); ?>
                     </div>
-
-                    <?php if ($link_text && $link_url) : ?>
-                        <a href="<?php echo esc_url($link_url); ?>" class="service-link"><?php echo esc_html($link_text); ?></a>
-                    <?php endif; ?>
+                    <h3 class="service-title"><?php echo esc_html($service['title']); ?></h3>
+                    <!-- <a href="<?php echo esc_url($link); ?>" class="service-link">En savoir plus</a> -->
                 </div>
             <?php endforeach; ?>
         </div>

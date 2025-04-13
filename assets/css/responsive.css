@@ -124,3 +124,60 @@
     margin-bottom: 20px;
   }
 }
+
+/******************/
+/***** BURGER *****/
+/******************/
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.burger-line {
+  width: 25px;
+  height: 3px;
+  background-color: var(--color-black);
+  transition: all 0.3s ease;
+}
+
+.menu-toggle.open .burger-line:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+.menu-toggle.open .burger-line:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.open .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Menu mobile caché par défaut */
+@media (max-width: 767px) {
+  .menu-toggle {
+    display: flex;
+  }
+
+  .main-navigation {
+    display: none;
+    width: 100%;
+    background-color: var(--color-white);
+    margin-top: 15px;
+  }
+
+  .main-navigation.active {
+    display: block;
+  }
+
+  .main-navigation ul {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .main-navigation li {
+    margin: 10px 0;
+  }
+}

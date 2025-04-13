@@ -44,6 +44,7 @@ function maitresse_margo_register_hero_cpt()
         'menu_position'      => 20,
         'menu_icon'          => 'dashicons-format-image',
         'supports'           => array('title'),
+        'show_in_rest'       => true,
     );
 
     register_post_type('hero', $args);
@@ -74,62 +75,12 @@ function maitresse_margo_hero_meta_box_callback($post)
     wp_nonce_field('maitresse_margo_hero_save_meta_box_data', 'maitresse_margo_hero_meta_box_nonce');
 
     $subtitle = get_post_meta($post->ID, '_hero_subtitle', true);
-    $button_text = get_post_meta($post->ID, '_hero_button_text', true);
-    $button_url = get_post_meta($post->ID, '_hero_button_url', true);
-    $background_image = get_post_meta($post->ID, '_hero_background_image', true);
 ?>
     <p>
-        <label for="hero_subtitle"><?php esc_html_e('Sous-titre:', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="hero_subtitle" name="hero_subtitle" value="<?php echo esc_attr($subtitle); ?>" style="width: 100%;">
+        <label for="hero_subtitle"><?php esc_html_e('Sous-titre / Description:', 'maitresse-margo'); ?></label><br>
+        <textarea id="hero_subtitle" name="hero_subtitle" rows="4" style="width: 100%;"><?php echo esc_textarea($subtitle); ?></textarea>
+        <span class="description"><?php esc_html_e('Ce texte apparaîtra sous le titre principal.', 'maitresse-margo'); ?></span>
     </p>
-    <p>
-        <label for="hero_button_text"><?php esc_html_e('Texte du bouton:', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="hero_button_text" name="hero_button_text" value="<?php echo esc_attr($button_text); ?>" style="width: 100%;">
-    </p>
-    <p>
-        <label for="hero_button_url"><?php esc_html_e('URL du bouton:', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="hero_button_url" name="hero_button_url" value="<?php echo esc_url($button_url); ?>" style="width: 100%;">
-    </p>
-    <p>
-        <label for="hero_background_image"><?php esc_html_e('Image de fond:', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="hero_background_image" name="hero_background_image" value="<?php echo esc_url($background_image); ?>" style="width: 80%;">
-        <button type="button" class="button" id="hero_background_image_button"><?php esc_html_e('Sélectionner une image', 'maitresse-margo'); ?></button>
-    <div id="hero_background_image_preview" style="margin-top: 10px;">
-        <?php if ($background_image) : ?>
-            <img src="<?php echo esc_url($background_image); ?>" style="max-width: 300px; height: auto;">
-        <?php endif; ?>
-    </div>
-    </p>
-    <script>
-        jQuery(document).ready(function($) {
-            $('#hero_background_image_button').click(function(e) {
-                e.preventDefault();
-
-                var image_frame;
-
-                if (image_frame) {
-                    image_frame.open();
-                    return;
-                }
-
-                image_frame = wp.media({
-                    title: '<?php esc_html_e('Sélectionner une image', 'maitresse-margo'); ?>',
-                    multiple: false,
-                    library: {
-                        type: 'image',
-                    }
-                });
-
-                image_frame.on('select', function() {
-                    var attachment = image_frame.state().get('selection').first().toJSON();
-                    $('#hero_background_image').val(attachment.url);
-                    $('#hero_background_image_preview').html('<img src="' + attachment.url + '" style="max-width: 300px; height: auto;">');
-                });
-
-                image_frame.open();
-            });
-        });
-    </script>
 <?php
 }
 
@@ -155,19 +106,7 @@ function maitresse_margo_hero_save_meta_box_data($post_id)
     }
 
     if (isset($_POST['hero_subtitle'])) {
-        update_post_meta($post_id, '_hero_subtitle', sanitize_text_field($_POST['hero_subtitle']));
-    }
-
-    if (isset($_POST['hero_button_text'])) {
-        update_post_meta($post_id, '_hero_button_text', sanitize_text_field($_POST['hero_button_text']));
-    }
-
-    if (isset($_POST['hero_button_url'])) {
-        update_post_meta($post_id, '_hero_button_url', esc_url_raw($_POST['hero_button_url']));
-    }
-
-    if (isset($_POST['hero_background_image'])) {
-        update_post_meta($post_id, '_hero_background_image', esc_url_raw($_POST['hero_background_image']));
+        update_post_meta($post_id, '_hero_subtitle', sanitize_textarea_field($_POST['hero_subtitle']));
     }
 }
 add_action('save_post', 'maitresse_margo_hero_save_meta_box_data');

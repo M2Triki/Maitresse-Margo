@@ -48,7 +48,7 @@ function maitresse_margo_register_presentation_cpt()
         'menu_position'      => 21,
         'menu_icon'          => 'dashicons-id-alt',
         'supports'           => array('title', 'editor', 'thumbnail'),
-        'show_in_rest'       => true, // Activer l'éditeur Gutenberg
+        'show_in_rest'       => true,
     );
 
     register_post_type('presentation', $args);
@@ -126,48 +126,3 @@ function maitresse_margo_presentation_save_meta_box_data($post_id)
     }
 }
 add_action('save_post', 'maitresse_margo_presentation_save_meta_box_data');
-
-/**
- * Ajouter une colonne pour l'image dans la liste des présentations
- */
-function maitresse_margo_presentation_columns($columns)
-{
-    $new_columns = array();
-    foreach ($columns as $key => $value) {
-        if ($key === 'title') {
-            $new_columns[$key] = $value;
-            $new_columns['thumbnail'] = __('Image', 'maitresse-margo');
-        } else {
-            $new_columns[$key] = $value;
-        }
-    }
-    return $new_columns;
-}
-add_filter('manage_presentation_posts_columns', 'maitresse_margo_presentation_columns');
-
-/**
- * Afficher le contenu des colonnes personnalisées
- */
-function maitresse_margo_presentation_custom_column($column, $post_id)
-{
-    if ($column === 'thumbnail') {
-        if (has_post_thumbnail($post_id)) {
-            echo get_the_post_thumbnail($post_id, array(50, 50));
-        } else {
-            echo '—';
-        }
-    }
-}
-add_action('manage_presentation_posts_custom_column', 'maitresse_margo_presentation_custom_column', 10, 2);
-
-/**
- * Ajouter un message d'aide dans l'écran d'édition
- */
-function maitresse_margo_presentation_contextual_help($contextual_help, $screen_id, $screen)
-{
-    if ('presentation' === $screen->post_type) {
-        $contextual_help = '<p>' . __('La section Présentation apparaît sur la page d\'accueil et présente "Qui est Maitresse Margo". Utilisez le titre pour le titre de la section, l\'éditeur pour le contenu principal, et l\'image mise en avant pour l\'image qui apparaîtra à côté du texte.', 'maitresse-margo') . '</p>';
-    }
-    return $contextual_help;
-}
-add_filter('contextual_help', 'maitresse_margo_presentation_contextual_help', 10, 3);

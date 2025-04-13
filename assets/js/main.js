@@ -11,7 +11,8 @@
   $(document).ready(function () {
     // Menu mobile
     $(".menu-toggle").on("click", function () {
-      $(".main-navigation").toggleClass("toggled");
+      $(".main-navigation").toggleClass("active");
+      $(this).toggleClass("open");
     });
 
     // Sous-menus sur mobile

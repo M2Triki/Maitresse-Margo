@@ -9,34 +9,23 @@
 // Récupérer le dernier élément Hero
 $hero_id = maitresse_margo_get_latest_cpt('hero');
 
-if (!$hero_id) {
-    return;
-}
+// Titre et sous-titre par défaut
+$title = 'Bienvenue sur Maitresse Margo';
+$subtitle = 'Un espace pensé pour les étudiants MEEF, les candidats au CRPE et les jeunes profs des écoles. Inspi, ressources & bonne humeur au programme !';
 
-// Récupérer les données avec get_post_meta uniquement
-$title = get_the_title($hero_id);
-$subtitle = get_post_meta($hero_id, '_hero_subtitle', true);
-$button_text = get_post_meta($hero_id, '_hero_button_text', true);
-$button_url = get_post_meta($hero_id, '_hero_button_url', true);
-$background_image = get_post_meta($hero_id, '_hero_background_image', true);
-
-// Style pour l'image de fond
-$style = '';
-if ($background_image) {
-    $style = 'style="background-image: url(' . esc_url($background_image) . '); background-size: cover; background-position: center;"';
+// Si un élément Hero existe, récupérer ses données
+if ($hero_id) {
+    $title = get_the_title($hero_id);
+    $subtitle_meta = get_post_meta($hero_id, '_hero_subtitle', true);
+    if (!empty($subtitle_meta)) {
+        $subtitle = $subtitle_meta;
+    }
 }
 ?>
 
-<section class="hero-section" <?php echo $style; ?>>
+<section class="hero-section">
     <div class="container">
         <h1 class="hero-title"><?php echo esc_html($title); ?></h1>
-
-        <?php if ($subtitle) : ?>
-            <p class="hero-description"><?php echo esc_html($subtitle); ?></p>
-        <?php endif; ?>
-
-        <?php if ($button_text && $button_url) : ?>
-            <a href="<?php echo esc_url($button_url); ?>" class="button"><?php echo esc_html($button_text); ?></a>
-        <?php endif; ?>
+        <p class="hero-description"><?php echo esc_html($subtitle); ?></p>
     </div>
 </section>

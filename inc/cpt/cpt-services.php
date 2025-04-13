@@ -41,9 +41,10 @@ function maitresse_margo_register_services_cpt()
         'capability_type'    => 'post',
         'has_archive'        => false,
         'hierarchical'       => false,
-        'menu_position'      => 23,
+        'menu_position'      => 22,
         'menu_icon'          => 'dashicons-clipboard',
-        'supports'           => array('title', 'editor'),
+        'supports'           => array('title'),
+        'show_in_rest'       => true,
     );
 
     register_post_type('service', $args);
@@ -74,17 +75,19 @@ function maitresse_margo_services_meta_box_callback($post)
     wp_nonce_field('maitresse_margo_services_save_meta_box_data', 'maitresse_margo_services_meta_box_nonce');
 
     $icon = get_post_meta($post->ID, '_service_icon', true);
-    $link_text = get_post_meta($post->ID, '_service_link_text', true);
     $link_url = get_post_meta($post->ID, '_service_link_url', true);
 ?>
     <p>
-        <label for="service_icon"><?php esc_html_e('Icône (classe Font Awesome):', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="service_icon" name="service_icon" value="<?php echo esc_attr($icon); ?>" style="width: 100%;" placeholder="fas fa-graduation-cap">
-        <small><?php esc_html_e('Exemple: fas fa-graduation-cap, fas fa-book, fas fa-chalkboard-teacher', 'maitresse-margo'); ?></small>
-    </p>
-    <p>
-        <label for="service_link_text"><?php esc_html_e('Texte du lien:', 'maitresse-margo'); ?></label><br>
-        <input type="text" id="service_link_text" name="service_link_text" value="<?php echo esc_attr($link_text); ?>" style="width: 100%;">
+        <label for="service_icon"><?php esc_html_e('Icône SVG:', 'maitresse-margo'); ?></label><br>
+        <select id="service_icon" name="service_icon" style="width: 100%;">
+            <option value=""><?php esc_html_e('Sélectionner une icône', 'maitresse-margo'); ?></option>
+            <option value="graduate" <?php selected($icon, 'graduate'); ?>><?php esc_html_e('Diplôme', 'maitresse-margo'); ?></option>
+            <option value="school" <?php selected($icon, 'school'); ?>><?php esc_html_e('École', 'maitresse-margo'); ?></option>
+            <option value="book" <?php selected($icon, 'book'); ?>><?php esc_html_e('Livre', 'maitresse-margo'); ?></option>
+            <option value="email" <?php selected($icon, 'email'); ?>><?php esc_html_e('Email', 'maitresse-margo'); ?></option>
+            <option value="fiches" <?php selected($icon, 'fiches'); ?>><?php esc_html_e('Fiches', 'maitresse-margo'); ?></option>
+            <option value="books" <?php selected($icon, 'books'); ?>><?php esc_html_e('Livres', 'maitresse-margo'); ?></option>
+        </select>
     </p>
     <p>
         <label for="service_link_url"><?php esc_html_e('URL du lien:', 'maitresse-margo'); ?></label><br>
@@ -116,10 +119,6 @@ function maitresse_margo_services_save_meta_box_data($post_id)
 
     if (isset($_POST['service_icon'])) {
         update_post_meta($post_id, '_service_icon', sanitize_text_field($_POST['service_icon']));
-    }
-
-    if (isset($_POST['service_link_text'])) {
-        update_post_meta($post_id, '_service_link_text', sanitize_text_field($_POST['service_link_text']));
     }
 
     if (isset($_POST['service_link_url'])) {
